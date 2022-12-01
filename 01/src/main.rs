@@ -22,9 +22,7 @@ impl Stats {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let Some(file) = args().nth(1) else {
-        return Err("error: no file name passed".into());
-    };
+    let file = args().nth(1).ok_or("error: no file name passed")?;
 
     let lines = BufReader::new(File::open(file)?).lines();
 

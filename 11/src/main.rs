@@ -81,7 +81,8 @@ impl Operation {
             Add(n) => worry.checked_add(n.value_or(worry)),
             Mul(n) => worry.checked_mul(n.value_or(worry)),
         }
-        .unwrap() % modulo
+        .unwrap()
+            % modulo
     }
 }
 
@@ -202,14 +203,16 @@ impl Monkey {
     fn do_keepaway(&mut self, modulo: usize) -> impl Iterator<Item = MonkeyRes> + '_ {
         self.counter = self.counter.checked_add(self.items.len()).unwrap();
 
-        mem::take(&mut self.items).into_iter().map(move |mut worry| {
-            worry = self.op.apply(worry, modulo);
+        mem::take(&mut self.items)
+            .into_iter()
+            .map(move |mut worry| {
+                worry = self.op.apply(worry, modulo);
 
-            MonkeyRes {
-                item: worry,
-                to: self.test.dispatch(worry),
-            }
-        })
+                MonkeyRes {
+                    item: worry,
+                    to: self.test.dispatch(worry),
+                }
+            })
     }
 
     fn push_item(&mut self, item: usize) {
@@ -284,14 +287,20 @@ fn main() -> Result<(), Box<dyn Error>> {
     // necessary otherwise - we must mutate the map, and we can't hold a mutable iterator to `monkeys`
     // while editing random keys at the same time
     let monkey_ids: Vec<_> = monkeys.keys().cloned().collect();
-    
-    // due to maths (that I must admit I did not rembember anything about) we can do modulo operations on the 
+
+    // due to maths (that I must admit I did not rembember anything about) we can do modulo operations on the
     // multiple of all primes (the input is all primes) and it should work
-    let all_primes_multiplied = monkeys.values().fold(1, |a, m| m.test.rem.checked_mul(a).unwrap());
+    let all_primes_multiplied = monkeys
+        .values()
+        .fold(1, |a, m| m.test.rem.checked_mul(a).unwrap());
 
     for _ in 1..=10000 {
         for mn in &monkey_ids {
-            let thrown_items: Vec<_> = monkeys.get_mut(&mn).unwrap().do_keepaway(all_primes_multiplied).collect();
+            let thrown_items: Vec<_> = monkeys
+                .get_mut(&mn)
+                .unwrap()
+                .do_keepaway(all_primes_multiplied)
+                .collect();
 
             for MonkeyRes { item, to } in thrown_items {
                 monkeys
